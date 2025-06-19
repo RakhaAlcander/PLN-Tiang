@@ -68,6 +68,18 @@ def delete_material_by_id(material_id):
     conn.commit()
     conn.close()
 
+def update_material(id, kategori, jenis_tiang, satuan, pasang, tunai, pln, harga_satuan_material, harga_satuan_tukang):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE material
+        SET kategori=?, jenis_tiang=?, satuan=?, pasang=?, tunai=?, pln=?, 
+            harga_satuan_material=?, harga_satuan_tukang=?
+        WHERE id=?
+    """, (kategori, jenis_tiang, satuan, pasang, tunai, pln, harga_satuan_material, harga_satuan_tukang, id))
+    conn.commit()
+    conn.close()
+
 def format_currency(val):
     try:
         val = float(val)
@@ -744,8 +756,9 @@ def main():
                 st.rerun()
     
         st.divider()
+        
         st.subheader("📋 Daftar Material Saat Ini")
-    
+        
         df = get_all_material()
         
         if df.empty:
@@ -754,31 +767,64 @@ def main():
             for kategori_db_view in df['kategori'].unique():
                 df_kat = df[df['kategori'] == kategori_db_view].copy()
         
-                # Format harga sebelum tampil
-                df_kat_display = df_kat.copy()
-                for col_curr in ['harga_satuan_material', 'harga_satuan_tukang']:
-                    if col_curr in df_kat_display.columns:
-                        df_kat_display[col_curr] = df_kat_display[col_curr].apply(format_currency)
-        
                 with st.expander(f"Kategori: {kategori_db_view} ({len(df_kat)} items)"):
-                    st.dataframe(
-                        df_kat_display.drop(columns=['id']),
-                        hide_index=True,
-                        use_container_width=True
-                    )
+                    # Tampilkan tabel saja:
+                    df_kat_display = df_kat.drop(columns=['id'])
+                    st.dataframe(df_kat_display, use_container_width=True)
         
-                    st.subheader("Hapus Material per Item:")
+                    # Tampilkan per-row tombol delete & edit
                     for index, row in df_kat.iterrows():
-                        if st.button(f"🗑️ Hapus '{row['jenis_tiang']}'", key=f"delete_row_{row['id']}"):
-                            delete_material_by_id(row['id'])
-                            st.success(f"Material '{row['jenis_tiang']}' dihapus.")
-                            st.rerun()
+                        col1, col2, col3 = st.columns([8, 1, 1])
+                        with col1:
+                            st.write(f"**{row['jenis_tiang']}** - {row['satuan']}")
         
-                    st.divider()
-                    if st.button(f"🗑️ Hapus Semua Material di {kategori_db_view}", key=f"delete_all_{kategori_db_view}_tab3"):
-                        delete_by_kategori(kategori_db_view)
-                        st.rerun()
-
+                        with col2:
+                            if st.button("🗑️", key=f"delete_row_{row['id']}"):
+                                delete_material_by_id(row['id'])
+                                st.success(f"Material '{row['jenis_tiang']}' dihapus.")
+                                st.rerun()
+        
+                        with col3:
+                            if st.button("✏️", key=f"edit_row_{row['id']}"):
+                                st.session_state['edit_row_id'] = row['id']
+                                st.rerun()
+        
+            # Bagian Form Edit
+            if 'edit_row_id' in st.session_state:
+                edit_id = st.session_state['edit_row_id']
+                df_edit = df[df['id'] == edit_id]
+                if not df_edit.empty:
+                    row_to_edit = df_edit.iloc[0]
+        
+                    st.subheader("✏️ Edit Material")
+        
+                    with st.form("edit_material_form"):
+                        mat_kategori = st.text_input("Kategori", value=row_to_edit['kategori'])
+                        mat_jenis = st.text_input("Jenis Tiang", value=row_to_edit['jenis_tiang'])
+                        mat_satuan = st.text_input("Satuan", value=row_to_edit['satuan'])
+                        mat_pasang = st.number_input("Pasang", value=row_to_edit['pasang'])
+                        mat_tunai = st.number_input("Tunai", value=row_to_edit['tunai'])
+                        mat_pln = st.number_input("PLN", value=row_to_edit['pln'])
+                        mat_harga_material = st.number_input("Harga Satuan Material", value=row_to_edit['harga_satuan_material'])
+                        mat_harga_tukang = st.number_input("Harga Satuan Tukang", value=row_to_edit['harga_satuan_tukang'])
+                        
+                        submitted_update = st.form_submit_button("Update Data")
+        
+                        if submitted_update:
+                            update_material(
+                                edit_id,
+                                mat_kategori,
+                                mat_jenis,
+                                mat_satuan,
+                                mat_pasang,
+                                mat_tunai,
+                                mat_pln,
+                                mat_harga_material,
+                                mat_harga_tukang
+                            )
+                            del st.session_state['edit_row_id']
+                            st.success("Data berhasil diperbarui!")
+                            st.rerun()
                         
     
     with tab4:
