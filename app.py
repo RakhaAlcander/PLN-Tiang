@@ -757,7 +757,7 @@ def main():
                         col1, col2 = st.columns([10, 1])
                         with col1:
                             st.write(
-                                f"**{row['jenis']}** - {row['satuan']}, "
+                                f"**{row['jenis_tiang']}** - {row['satuan']}, "
                                 f"Pasang: {row['vol_pasang']}, Tunai: {row['vol_tunai']}, PLN: {row['vol_pln']}, "
                                 f"Harga Material: {format_currency(row['harga_satuan_material'])}, "
                                 f"Harga Tukang: {format_currency(row['harga_satuan_tukang'])}"
