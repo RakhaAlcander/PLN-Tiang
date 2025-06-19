@@ -68,8 +68,15 @@ def delete_material_by_id(material_id):
     conn.commit()
     conn.close()
 
+# def format_currency(val):
+#     return f"Rp {val:,.0f}".replace(",", ".")
+
 def format_currency(val):
-    return f"Rp {val:,.0f}".replace(",", ".")
+    try:
+        val = float(val)
+        return f"Rp {val:,.0f}".replace(",", ".")
+    except (ValueError, TypeError):
+        return "Rp -"
 
 # Set page config
 st.set_page_config(
@@ -276,12 +283,18 @@ def calculate_rab_detail(jumlah_tiang_per_kategori):
             rab_detail[kategori].append(rab_item)
     return rab_detail
 
-
-def format_currency(amount):
-    """Format currency to IDR"""
-    if pd.isna(amount):
+def format_currency(val):
+    try:
+        val = float(val)
+        return f"Rp {val:,.0f}".replace(",", ".")
+    except (ValueError, TypeError):
         return "Rp -"
-    return f"Rp {amount:,.0f}".replace(',', '#').replace('.', ',').replace('#', '.')
+
+# def format_currency(amount):
+#     """Format currency to IDR"""
+#     if pd.isna(amount):
+#         return "Rp -"
+#     return f"Rp {amount:,.0f}".replace(',', '#').replace('.', ',').replace('#', '.')
 
 def get_marker_color(kategori):
     """Get marker color based on kategori tiang"""
