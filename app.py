@@ -3,11 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import io
-# import openpyxl # openpyxl is used by pandas for xlsx, direct import not always needed
-# from openpyxl import Workbook # Not explicitly used, pandas handles workbook creation
-# from openpyxl.styles import Font, PatternFill, Alignment # Not explicitly used
 import math
-# Folium imports removed:
 import folium 
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
@@ -65,6 +61,13 @@ def delete_by_kategori(kat):
     conn.commit()
     conn.close()
 
+def delete_material_by_id(material_id):
+    conn = sqlite3.connect('database_material.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM material WHERE id = ?", (material_id,))
+    conn.commit()
+    conn.close()
+
 def format_currency(val):
     return f"Rp {val:,.0f}".replace(",", ".")
 
@@ -80,87 +83,6 @@ init_db()
 # Initialize session state
 if 'tiang_data' not in st.session_state:
     st.session_state.tiang_data = []
-
-# if 'database_material' not in st.session_state:
-#     st.session_state.database_material = {
-#         'TM1': [
-#             {
-#                 'no': 1,
-#                 'jenis_tiang': 'Cross Arm UNP 100 - 2000 mm - (l=50 mm, t=5 mm, tgg=100 mm)-Tumpu',
-#                 'satuan': 'B',
-#                 'pasang': 2, 'tunai': 2, 'pln': 2,
-#                 'harga_satuan_material': 150000, 'harga_satuan_tukang': 25000
-#             },
-#             {
-#                 'no': 2, 'jenis_tiang': 'Arm Tie Type 750 - 3/4" - (t=2,3 mm)', 'satuan': 'B',
-#                 'pasang': 4, 'tunai': 4, 'pln': 4,
-#                 'harga_satuan_material': 35000, 'harga_satuan_tukang': 5000
-#             },
-#             {
-#                 'no': 3, 'jenis_tiang': 'Bolt & Nut M.16 x 50 - HDG', 'satuan': 'B',
-#                 'pasang': 8, 'tunai': 8, 'pln': 8,
-#                 'harga_satuan_material': 15000, 'harga_satuan_tukang': 2000
-#             },
-#             {
-#                 'no': 4, 'jenis_tiang': 'Insulator - Pin Post Insulator 20 kV;12,5 kN - Porcelain (Tumpu)', 'satuan': 'B',
-#                 'pasang': 3, 'tunai': 3, 'pln': 3,
-#                 'harga_satuan_material': 750000, 'harga_satuan_tukang': 50000
-#             }
-#         ],
-#         'TM2': [
-#             {
-#                 'no': 1, 'jenis_tiang': 'Cross Arm UNP 120 - 2500 mm - (l=60 mm, t=6 mm, tgg=120 mm)-Tumpu', 'satuan': 'B',
-#                 'pasang': 2, 'tunai': 2, 'pln': 2,
-#                 'harga_satuan_material': 200000, 'harga_satuan_tukang': 35000
-#             },
-#             {
-#                 'no': 2, 'jenis_tiang': 'Arm Tie Type 1000 - 1" - (t=3,0 mm)', 'satuan': 'B',
-#                 'pasang': 4, 'tunai': 4, 'pln': 4,
-#                 'harga_satuan_material': 50000, 'harga_satuan_tukang': 7500
-#             },
-#             {
-#                 'no': 3, 'jenis_tiang': 'Bolt & Nut M.18 x 60 - HDG', 'satuan': 'B',
-#                 'pasang': 10, 'tunai': 10, 'pln': 10,
-#                 'harga_satuan_material': 18000, 'harga_satuan_tukang': 2500
-#             }
-#         ],
-#         'TM5': [
-#             {
-#                 'no': 1, 'jenis_tiang': 'Cross Arm UNP 140 - 3000 mm - (l=70 mm, t=7 mm, tgg=140 mm)-Tumpu', 'satuan': 'B',
-#                 'pasang': 2, 'tunai': 2, 'pln': 2,
-#                 'harga_satuan_material': 250000, 'harga_satuan_tukang': 40000
-#             },
-#             {
-#                 'no': 2, 'jenis_tiang': 'Arm Tie Type 1250 - 1.25" - (t=3,5 mm)', 'satuan': 'B',
-#                 'pasang': 6, 'tunai': 6, 'pln': 6,
-#                 'harga_satuan_material': 65000, 'harga_satuan_tukang': 10000
-#             }
-#         ],
-#         'TM10': [
-#             {
-#                 'no': 1, 'jenis_tiang': 'Cross Arm UNP 160 - 3500 mm - (l=80 mm, t=8 mm, tgg=160 mm)-Tumpu', 'satuan': 'B',
-#                 'pasang': 2, 'tunai': 2, 'pln': 2,
-#                 'harga_satuan_material': 350000, 'harga_satuan_tukang': 50000
-#             },
-#             {
-#                 'no': 2, 'jenis_tiang': 'Ground Wire Clamp Type A - TM - (l=80 mm, t=8 mm, p=400 mm)', 'satuan': 'B',
-#                 'pasang': 2, 'tunai': 2, 'pln': 2,
-#                 'harga_satuan_material': 125000, 'harga_satuan_tukang': 15000
-#             }
-#         ],
-#         'TM4': [ # Tiang akhir/mati
-#             {
-#                 'no': 1, 'jenis_tiang': 'Anchor Bolt M.20 x 500 - HDG', 'satuan': 'B',
-#                 'pasang': 4, 'tunai': 4, 'pln': 4,
-#                 'harga_satuan_material': 85000, 'harga_satuan_tukang': 12000
-#             },
-#             {
-#                 'no': 2, 'jenis_tiang': 'Guy Wire 7/2.5 - Galvanized', 'satuan': 'M',
-#                 'pasang': 25, 'tunai': 25, 'pln': 25,
-#                 'harga_satuan_material': 15000, 'harga_satuan_tukang': 2000
-#             }
-#         ]
-#     }
 
 if 'tiang_awal' not in st.session_state:
     st.session_state.tiang_awal = 'TM1'
@@ -775,11 +697,11 @@ def main():
     with tab3:
         st.header("🗃️ Database Material Tersimpan")
         st.subheader("➕ Tambah/Edit Material")
-
+    
         # Ambil kategori unik dari database
         df_material_all = get_all_material()
         kategori_list = sorted(df_material_all['kategori'].unique()) if not df_material_all.empty else []
-
+    
         with st.form("add_material_form_tab3"): 
             col_m1, col_m2, col_m3 = st.columns(3)
             with col_m1:
@@ -790,7 +712,7 @@ def main():
                 )
                 if mat_kategori_input == "Kategori Baru...":
                     mat_kategori_input = st.text_input("Nama Kategori Baru:", key="mat_cat_new_tab3").upper().replace(" ","")
-
+    
                 mat_jenis_input = st.text_input("Jenis Material/Pekerjaan", key="mat_jenis_tab3")
                 mat_satuan_input = st.text_input("Satuan", value="Bh", key="mat_satuan_tab3")
             with col_m2:
@@ -802,7 +724,7 @@ def main():
                 mat_harga_tukang_input = st.number_input("Harga Satuan Tukang (Rp)", min_value=0, value=0, step=100, key="mat_hrg_tuk_tab3")
             
             submitted_add_material = st.form_submit_button("➕ Tambah/Update Material")
-
+    
             if submitted_add_material and mat_kategori_input and mat_jenis_input:
                 add_or_update_material(
                     mat_kategori_input,
@@ -816,10 +738,10 @@ def main():
                 )
                 st.success(f"Material '{mat_jenis_input}' berhasil ditambahkan/diperbarui ke kategori {mat_kategori_input}.")
                 st.rerun()
-
+    
         st.divider()
         st.subheader("📋 Daftar Material Saat Ini")
-
+    
         df = get_all_material()
         if df.empty:
             st.info("Database material kosong. Silakan tambahkan material.")
@@ -829,14 +751,28 @@ def main():
                 for col_curr in ['harga_satuan_material', 'harga_satuan_tukang']:
                     if col_curr in df_kat.columns:
                         df_kat[col_curr] = df_kat[col_curr].apply(format_currency)
+                
                 with st.expander(f"Kategori: {kategori_db_view} ({len(df_kat)} items)"):
-                    st.dataframe(df_kat.drop(columns=['id']), hide_index=True, use_container_width=True)
+                    for index, row in df_kat.iterrows():
+                        col1, col2 = st.columns([10, 1])
+                        with col1:
+                            st.write(
+                                f"**{row['jenis']}** - {row['satuan']}, "
+                                f"Pasang: {row['vol_pasang']}, Tunai: {row['vol_tunai']}, PLN: {row['vol_pln']}, "
+                                f"Harga Material: {format_currency(row['harga_satuan_material'])}, "
+                                f"Harga Tukang: {format_currency(row['harga_satuan_tukang'])}"
+                            )
+                        with col2:
+                            if st.button("🗑️", key=f"delete_row_{row['id']}"):
+                                delete_material_by_id(row['id'])
+                                st.success(f"Material '{row['jenis']}' dihapus.")
+                                st.rerun()
+                    
+                    st.divider()
                     if st.button(f"🗑️ Hapus Semua Material di {kategori_db_view}", key=f"delete_all_{kategori_db_view}_tab3", type="secondary"):
                         delete_by_kategori(kategori_db_view)
                         st.rerun()
 
-                    else:
-                        st.write("Tidak ada material di kategori ini.")
     
     with tab4:
         st.header("⬇️ Export Data ke Excel")
