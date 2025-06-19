@@ -765,7 +765,7 @@ def main():
                         with col2:
                             if st.button("🗑️", key=f"delete_row_{row['id']}"):
                                 delete_material_by_id(row['id'])
-                                st.success(f"Material '{row['jenis']}' dihapus.")
+                                st.success(f"Material '{row['jenis_tiang']}' dihapus.")
                                 st.rerun()
                     
                     st.divider()
