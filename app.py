@@ -718,7 +718,7 @@ def main():
                     mat_kategori_input = st.text_input("Nama Kategori Baru:", key="mat_cat_new_tab3").upper().replace(" ","")
     
                 mat_jenis_input = st.text_input("Jenis Material/Pekerjaan", key="mat_jenis_tab3")
-                mat_satuan_input = st.text_input("Satuan", value="Bh", key="mat_satuan_tab3")
+                mat_satuan_input = st.text_input("Satuan", value="B", key="mat_satuan_tab3")
             with col_m2:
                 mat_pasang_input = st.number_input("Volume Pasang", min_value=0.0, value=1.0, step=0.1, key="mat_pasang_tab3")
                 mat_tunai_input = st.number_input("Volume Tunai", min_value=0.0, value=1.0, step=0.1, key="mat_tunai_tab3")
