@@ -754,25 +754,43 @@ def main():
             for kategori_db_view in df['kategori'].unique():
                 df_kat = df[df['kategori'] == kategori_db_view].copy()
         
-                # Salin dataframe untuk tampilan, format harga jadi string currency
+                # Tambahkan kolom tombol hapus dummy
+                df_kat['hapus'] = '🗑️ Hapus'
+        
+                # Format harga sebelum tampil
                 df_kat_display = df_kat.copy()
                 for col_curr in ['harga_satuan_material', 'harga_satuan_tukang']:
                     if col_curr in df_kat_display.columns:
                         df_kat_display[col_curr] = df_kat_display[col_curr].apply(format_currency)
         
                 with st.expander(f"Kategori: {kategori_db_view} ({len(df_kat)} items)"):
-                    st.dataframe(
+                    edited = st.data_editor(
                         df_kat_display.drop(columns=['id']),
                         hide_index=True,
-                        use_container_width=True
+                        use_container_width=True,
+                        disabled=df_kat_display.columns.tolist(),  # Supaya kolom ga bisa di-edit
+                        column_config={
+                            "hapus": st.column_config.ButtonColumn(
+                                "Hapus",
+                                help="Klik untuk menghapus baris ini"
+                            )
+                        }
                     )
         
-                    # Tombol hapus semua kategori
+                    # Cek jika ada tombol hapus diklik
+                    for index, row in edited.iterrows():
+                        if row['hapus'] != '🗑️ Hapus':
+                            id_to_delete = df_kat.iloc[index]['id']
+                            delete_material_by_id(id_to_delete)
+                            st.success(f"Material '{row['jenis_tiang']}' dihapus.")
+                            st.rerun()
+        
+                    # Tombol hapus semua
                     st.divider()
                     if st.button(f"🗑️ Hapus Semua Material di {kategori_db_view}", key=f"delete_all_{kategori_db_view}_tab3", type="secondary"):
                         delete_by_kategori(kategori_db_view)
                         st.rerun()
-
+                        
     
     with tab4:
         st.header("⬇️ Export Data ke Excel")
