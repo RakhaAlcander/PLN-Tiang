@@ -68,9 +68,6 @@ def delete_material_by_id(material_id):
     conn.commit()
     conn.close()
 
-# def format_currency(val):
-#     return f"Rp {val:,.0f}".replace(",", ".")
-
 def format_currency(val):
     try:
         val = float(val)
@@ -289,12 +286,6 @@ def format_currency(val):
         return f"Rp {val:,.0f}".replace(",", ".")
     except (ValueError, TypeError):
         return "Rp -"
-
-# def format_currency(amount):
-#     """Format currency to IDR"""
-#     if pd.isna(amount):
-#         return "Rp -"
-#     return f"Rp {amount:,.0f}".replace(',', '#').replace('.', ',').replace('#', '.')
 
 def get_marker_color(kategori):
     """Get marker color based on kategori tiang"""
@@ -761,9 +752,6 @@ def main():
         else:
             for kategori_db_view in df['kategori'].unique():
                 df_kat = df[df['kategori'] == kategori_db_view].copy()
-                for col_curr in ['harga_satuan_material', 'harga_satuan_tukang']:
-                    if col_curr in df_kat.columns:
-                        df_kat[col_curr] = df_kat[col_curr].apply(format_currency)
                 
                 with st.expander(f"Kategori: {kategori_db_view} ({len(df_kat)} items)"):
                     for index, row in df_kat.iterrows():
