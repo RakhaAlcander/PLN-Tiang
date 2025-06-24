@@ -521,8 +521,8 @@ def main():
         """)
         st.info("💡 **Catatan**: Sistem mendukung format Excel (.xlsx, .xls) dan CSV (.csv). Sudut dapat dihitung otomatis jika tersedia data Latitude & Longitude.")
 
-    tab_titles = ["📤 Import Data", "📊 Hasil & RAB", "🗃️ Database Material", "⬇️ Export"]
-    tab1, tab2, tab3, tab4 = st.tabs(tab_titles) 
+    tab_titles = ["📤 Import Data", "🗺️ Visualisasi Peta", "📊 Hasil & RAB", "🗃️ Database Material", "⬇️ Export"]
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(tab_titles)
     
     with tab1:
         col1, col2 = st.columns(2)
@@ -656,7 +656,19 @@ def main():
     
     tiang_final_processed, klasifikasi_counts_processed, rab_detail_processed = process_tiang_data()
 
+
     with tab2:
+    st.header("🗺️ Visualisasi Peta Tiang")
+
+    if tiang_final_processed:
+        map_obj = create_map_with_tiang_data(tiang_final_processed)
+        if map_obj:
+            folium_static(map_obj, width=900, height=600)
+    else:
+        st.info("Belum ada data tiang untuk divisualisasikan.")
+
+    
+    with tab3:
         st.header("📊 Hasil Klasifikasi & RAB")
         col_list, col_summary = st.columns([2,3])
 
@@ -726,7 +738,7 @@ def main():
             else:
                 st.info("Belum ada detail RAB untuk ditampilkan.")
 
-    with tab3:
+    with tab4:
         st.header("🗃️ Database Material Tersimpan")
         st.subheader("➕ Tambah/Edit Material")
     
@@ -851,7 +863,7 @@ def main():
                         st.rerun()
 
     
-    with tab4:
+    with tab5:
         st.header("⬇️ Export Data ke Excel")
         if not tiang_final_processed:
             st.warning("Tidak ada data tiang untuk diekspor. Silakan import atau input data tiang terlebih dahulu.")
