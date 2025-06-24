@@ -653,7 +653,8 @@ def main():
 
     with tab2:
     st.header("🗺️ Visualisasi Peta Tiang")
-
+    tiang_data = st.session_state.get('tiang_data', [])
+    
     if 'tiang_data' in st.session_state and st.session_state.tiang_data:
         map_obj = create_map_with_tiang_data(st.session_state.tiang_data)
         if map_obj:
