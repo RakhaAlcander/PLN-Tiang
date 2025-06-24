@@ -397,11 +397,11 @@ def create_map_with_tiang_data(tiang_data):
 
     return m
 
-st.title("Visualisasi Tiang Listrik")
+# st.title("Visualisasi Tiang Listrik")
 
-map_obj = create_map_with_tiang_data(tiang_data)
-if map_obj:
-    folium_static(map_obj, width=900, height=600)
+# map_obj = map_obj = create_map_with_tiang_data(st.session_state.tiang_data)
+# if map_obj:
+#     folium_static(map_obj, width=900, height=600)
 
 def process_tiang_data():
     """Process tiang data for klasifikasi and RAB, returning updated tiang list and counts."""
@@ -661,7 +661,7 @@ def main():
     st.header("🗺️ Visualisasi Peta Tiang")
 
     if tiang_final_processed:
-        map_obj = create_map_with_tiang_data(tiang_final_processed)
+        map_obj = map_obj = create_map_with_tiang_data(st.session_state.tiang_data)
         if map_obj:
             folium_static(map_obj, width=900, height=600)
     else:
