@@ -7,6 +7,7 @@ import math
 import folium 
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
+from folium.plugins import BeautifyIcon
 import re 
 import sqlite3
 def get_connection():
@@ -320,6 +321,82 @@ def is_valid_coordinate(value, latlon='lat'):
             return -180 <= val <= 180
     except (ValueError, TypeError):
         return False
+
+# def create_map_with_tiang_data(tiang_data):
+#     """Create Folium map with tiang data"""
+#     if not tiang_data:
+#         st.info("Tidak ada data tiang untuk ditampilkan di peta")
+#         return None
+
+#     # Bersihkan dan validasi data koordinat
+#     valid_coords = []
+#     for t in tiang_data:
+#         lat = t.get('latitude')
+#         lon = t.get('longitude')
+#         if is_valid_coordinate(lat, 'lat') and is_valid_coordinate(lon, 'lon'):
+#             t['latitude'] = float(lat)
+#             t['longitude'] = float(lon)
+#             valid_coords.append(t)
+
+#     if not valid_coords:
+#         st.warning("Tidak ada data tiang dengan koordinat valid untuk ditampilkan di peta")
+#         return None
+
+#     # Hitung center map
+#     center_lat = sum(t['latitude'] for t in valid_coords) / len(valid_coords)
+#     center_lon = sum(t['longitude'] for t in valid_coords) / len(valid_coords)
+
+#     # Buat peta
+#     m = folium.Map(
+#         location=[center_lat, center_lon],
+#         zoom_start=12,
+#         tiles="OpenStreetMap"
+#     )
+
+#     # Tambahkan marker tiang
+#     for i, tiang in enumerate(valid_coords):
+#         kategori = tiang.get('kategori_final', tiang.get('kategori', 'Unknown'))
+#         color = get_marker_color(kategori)
+
+#         popup_html = f"""
+#         <div style="width: 250px;">
+#             <h4>{tiang.get('nama', f'Tiang {i+1}')}</h4>
+#             <p><b>Koordinat:</b> {tiang['latitude']:.6f}, {tiang['longitude']:.6f}</p>
+#             <p><b>Kategori:</b> {kategori}</p>
+#             <p><b>Sudut:</b> {tiang.get('sudut', 'N/A')}°</p>
+#             <p><b>Posisi:</b> {tiang.get('posisi', 'N/A')}</p>
+#             <p><b>Sumber:</b> {tiang.get('source_type', 'Manual')}</p>
+#         </div>
+#         """
+
+#         folium.Marker(
+#             location=[tiang['latitude'], tiang['longitude']],
+#             popup=folium.Popup(popup_html, max_width=300),
+#             tooltip=f"{tiang.get('nama', f'Tiang {i+1}')} ({kategori})",
+#             icon=folium.Icon(color=color, icon='flash', prefix='fa')
+#         ).add_to(m)
+
+#     # Tambahkan polyline rute jika ada lebih dari 1 titik
+#     if len(valid_coords) > 1:
+#         coords = [[t['latitude'], t['longitude']] for t in valid_coords]
+#         folium.PolyLine(coords, color='blue', weight=3, opacity=0.7).add_to(m)
+
+#     # Tambahkan legenda kategori
+#     legend_html = '''
+#     <div style="position: fixed; bottom: 50px; left: 50px; width: 200px; 
+#                 background-color: white; border:2px solid grey; z-index:9999; 
+#                 font-size:14px; padding: 10px">
+#         <h4>Kategori Tiang</h4>
+#         <p><i class="fa fa-flash" style="color:green"></i> TM1 (0°-15°)</p>
+#         <p><i class="fa fa-flash" style="color:blue"></i> TM2 (16°-30°)</p>
+#         <p><i class="fa fa-flash" style="color:orange"></i> TM5 (31°-60°)</p>
+#         <p><i class="fa fa-flash" style="color:red"></i> TM10 (61°-180°)</p>
+#         <p><i class="fa fa-flash" style="color:purple"></i> TM4 (Akhir)</p>
+#     </div>
+#     '''
+#     m.get_root().html.add_child(folium.Element(legend_html))
+
+#     return m
 
 def create_map_with_tiang_data(tiang_data):
     """Create Folium map with tiang data"""
