@@ -652,15 +652,15 @@ def main():
 
 
     with tab2:
-    st.header("🗺️ Visualisasi Peta Tiang")
-    tiang_data = st.session_state.get('tiang_data', [])
-    
-    if 'tiang_data' in st.session_state and st.session_state.tiang_data:
-        map_obj = create_map_with_tiang_data(st.session_state.tiang_data)
-        if map_obj:
-            folium_static(map_obj, width=900, height=600)
-    else:
-        st.info("Belum ada data tiang untuk divisualisasikan.")
+        st.header("🗺️ Visualisasi Peta Tiang")
+        tiang_data = st.session_state.get('tiang_data', [])
+        
+        if 'tiang_data' in st.session_state and st.session_state.tiang_data:
+            map_obj = create_map_with_tiang_data(st.session_state.tiang_data)
+            if map_obj:
+                folium_static(map_obj, width=900, height=600)
+        else:
+            st.info("Belum ada data tiang untuk divisualisasikan.")
 
     
     with tab3:
