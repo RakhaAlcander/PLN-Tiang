@@ -484,21 +484,27 @@ def process_tiang_data():
     for i, tiang_original in enumerate(st.session_state.tiang_data):
         tiang = tiang_original.copy()
         posisi = 'awal' if i == 0 else 'akhir' if i == len(st.session_state.tiang_data) - 1 else 'tengah'
-
+    
+        # Bersihkan kategori dari string 'None' atau kosong
+        kategori = tiang.get('kategori')
+        if kategori in ['None', '', None]:
+            kategori = None
+    
         if posisi == 'awal':
-            tiang['kategori_final'] = st.session_state.tiang_awal
+            tiang['kategori_final'] = st.session_state.get('tiang_awal', 'TM1')
         elif posisi == 'akhir':
-            tiang['kategori_final'] = 'TM4'  # ✅ FORCE TIANG TERAKHIR JADI TM4
+            tiang['kategori_final'] = 'TM4'
         else:
-            if tiang.get('kategori') is None and tiang.get('sudut') is not None:
-                tiang['kategori_final'] = klasifikasi_tiang(tiang['sudut'])
-            elif tiang.get('kategori') is not None:
-                tiang['kategori_final'] = tiang['kategori']
+            if kategori is not None:
+                tiang['kategori_final'] = kategori
+            elif tiang.get('sudut') is not None:
+                tiang['kategori_final'] = klasifikasi_tiang(tiang.get('sudut'))
             else:
                 tiang['kategori_final'] = None
-
+    
         tiang['posisi'] = posisi
         tiang_final_list.append(tiang)
+
 
     # Hitung jumlah kategori
     klasifikasi_count = {}
