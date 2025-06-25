@@ -126,25 +126,25 @@ def angle_diff(b1, b2):
 
 # Functions from existing app.py (potentially modified)
 def klasifikasi_tiang(sudut):
-    """Klasifikasi tiang berdasarkan sudut (0-180 degrees from angle_diff)."""
+    """Klasifikasi tiang berdasarkan sudut (0–180°)."""
     if sudut is None or pd.isna(sudut):
         return None
     try:
         sudut = float(sudut)
     except (ValueError, TypeError):
         return None
-    
+
     if 0 <= sudut <= 15:
         return "TM1"
-    elif 16 <= sudut <= 30:
+    elif 15 < sudut <= 30:
         return "TM2"
-    elif 31 <= sudut <= 60:
+    elif 30 < sudut <= 60:
         return "TM5"
-    elif 61 <= sudut <= 180: # angle_diff ensures sudut <= 180
+    elif 60 < sudut <= 180:
         return "TM10"
     else:
-        # This case should ideally not be reached if angle_diff is used
-        return None 
+        return None
+ 
 
 def standardize_kategori(kategori):
     """Standardisasi kategori dari Excel - DIPERBAIKI"""
@@ -476,38 +476,42 @@ def create_map_with_tiang_data(tiang_data):
 
 def process_tiang_data():
     """Process tiang data for klasifikasi and RAB, returning updated tiang list and counts."""
-    if not st.session_state.tiang_data:
-        return [], {}, {} 
+    if not st.session_state.get('tiang_data'):
+        return [], {}, {}
 
-    tiang_final_list = [] 
-    
+    tiang_final_list = []
+
     for i, tiang_original in enumerate(st.session_state.tiang_data):
-        tiang = tiang_original.copy() 
+        tiang = tiang_original.copy()
         posisi = 'awal' if i == 0 else 'akhir' if i == len(st.session_state.tiang_data) - 1 else 'tengah'
-        
+
         if posisi == 'awal':
             tiang['kategori_final'] = st.session_state.tiang_awal
         elif posisi == 'akhir':
-            tiang['kategori_final'] = 'TM4' 
+            tiang['kategori_final'] = 'TM4'  # ✅ FORCE TIANG TERAKHIR JADI TM4
         else:
             if tiang.get('kategori') is None and tiang.get('sudut') is not None:
                 tiang['kategori_final'] = klasifikasi_tiang(tiang['sudut'])
             elif tiang.get('kategori') is not None:
                 tiang['kategori_final'] = tiang['kategori']
-            else: 
-                tiang['kategori_final'] = None 
+            else:
+                tiang['kategori_final'] = None
+
         tiang['posisi'] = posisi
         tiang_final_list.append(tiang)
-    
+
+    # Hitung jumlah kategori
     klasifikasi_count = {}
     for tiang in tiang_final_list:
         kategori = tiang['kategori_final']
-        if kategori: 
+        if kategori:
             klasifikasi_count[kategori] = klasifikasi_count.get(kategori, 0) + 1
-            
+
+    # Hitung detail RAB
     rab_detail_calculated = calculate_rab_detail(klasifikasi_count)
-    
+
     return tiang_final_list, klasifikasi_count, rab_detail_calculated
+
 
 def export_to_excel(tiang_final_list, klasifikasi, rab_detail):
     """Export data ke Excel"""
